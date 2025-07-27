@@ -7,6 +7,8 @@ import {useState} from "react";
 
 function Card() {
     const [visibleForm, setVisibleForm] = useState(false);
+    const [dram, setDram] = useState('');
+    const [ruble, setRuble] = useState('');
 
     const handleToggleForm = () => {
         setVisibleForm(!visibleForm);
@@ -14,6 +16,47 @@ function Card() {
 
     const closeForm = () => {
         setVisibleForm(false);
+    };
+
+    const convertDramCurrency = (value) => {
+        setDram(value);
+        const numericValue = parseFloat(value);
+        if (!isNaN(numericValue)) {
+            const result = calculateTotalAmount(numericValue, '*', 15);
+            setRuble(result);
+        } else {
+            setRuble('');
+        }
+    };
+
+    const convertRubleCurrency = (value) => {
+        setRuble(value);
+        const numericValue = parseFloat(value);
+        if (!isNaN(numericValue)) {
+            const result = calculateTotalAmount(value, '/', 15);
+            setDram(result);
+        } else {
+            setDram('');
+        }
+    };
+
+    const calculateTotalAmount = (value, operation, factor) => {
+        if (operation === '*') {
+            return formatNumber(value * factor);
+        } else if (operation === '/') {
+            return formatNumber(value / factor);
+        }
+    };
+
+    const formatNumber = (value) => {
+        if (value === '' || isNaN(value)) return '';
+        return value.toLocaleString();
+    };
+
+    const checkNumericValue = (event) => {
+        if (!/[0-9]/.test(event.key)) {
+            event.preventDefault();
+        }
     };
 
     return (<section className="shadow-2xl rounded-lg px-10 py-12 w-full max-w-xl space-y-8">
@@ -25,13 +68,25 @@ function Card() {
             <span className="uppercase text-gray-600">Укажите сумму</span>
             <div className="flex items-center mt-2">
                 <div className="relative">
-                    <input type="number" name="dram" placeholder="0000.00"
-                           className="py-3 px-3 rounded-l-lg bg-[#FAFAFC] border border-gray-200 w-full max-w-38"/>
+                    <input
+                        value={dram}
+                        onChange={(event) => convertDramCurrency(event.target.value)}
+                        onKeyPress={(event) => checkNumericValue(event)}
+                        type="text"
+                        name="dram"
+                        placeholder="0000.00"
+                        className="py-3 pl-3 pr-9 rounded-l-lg bg-[#FAFAFC] border border-gray-200 w-full max-w-38"/>
                     <DramIcon className="absolute top-3.5 right-3"/>
                 </div>
                 <div className="relative">
-                    <input type="number" name="ruble" placeholder="0000.00"
-                           className="py-3 px-3 rounded-r-lg bg-[#FAFAFC] border-y border-r border-gray-200 w-full max-w-38"/>
+                    <input
+                        value={ruble}
+                        onChange={(event) => convertRubleCurrency(event.target.value)}
+                        onKeyPress={(event) => checkNumericValue(event)}
+                        type="text"
+                        name="ruble"
+                        placeholder="0000.00"
+                        className="py-3 pl-3 pr-9 rounded-r-lg bg-[#FAFAFC] border-y border-r border-gray-200 w-full max-w-38"/>
                     <RubleIcon className="absolute top-3.5 right-3"/>
                 </div>
             </div>
