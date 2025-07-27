@@ -1,9 +1,12 @@
-import './App.css';
+import Card from "./components/card/Card.jsx";
+import Container from "./components/Container.jsx";
 
 function App() {
     return (
         <>
-            <h1>Hello World</h1>
+            <Container>
+                <Card/>
+            </Container>
         </>
     );
 }

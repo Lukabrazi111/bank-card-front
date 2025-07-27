@@ -1,0 +1,6 @@
+.card {
+    background-image: url("../../assets/circles-image.png"), linear-gradient(#A6C8FF, #0043CE);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
