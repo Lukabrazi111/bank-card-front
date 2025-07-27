@@ -20,23 +20,21 @@ function Card() {
 
     const convertDramCurrency = (value) => {
         setDram(value);
-        const numericValue = parseFloat(value);
-        if (!isNaN(numericValue)) {
-            const result = calculateTotalAmount(numericValue, '*', 15);
-            setRuble(result);
-        } else {
-            setRuble('');
-        }
+        calculateCurrency(value, setRuble);
     };
 
     const convertRubleCurrency = (value) => {
         setRuble(value);
+        calculateCurrency(value, setDram);
+    };
+
+    const calculateCurrency = (value, setState) => {
         const numericValue = parseFloat(value);
         if (!isNaN(numericValue)) {
-            const result = calculateTotalAmount(value, '/', 15);
-            setDram(result);
+            const result = calculateTotalAmount(numericValue, '*', 15);
+            setState(result);
         } else {
-            setDram('');
+            setState('');
         }
     };
 
