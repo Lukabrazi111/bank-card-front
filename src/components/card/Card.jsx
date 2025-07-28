@@ -44,6 +44,8 @@ function Card() {
         } else if (operation === '/') {
             return formatNumber(value / factor);
         }
+
+        return '';
     };
 
     const formatNumber = (value) => {
