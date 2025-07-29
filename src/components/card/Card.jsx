@@ -23,7 +23,7 @@ function Card() {
 
         <CardCurrencyConverter/>
 
-        <form action="/test" className="space-y-7">
+        <form action="#" className="space-y-7">
             <div className="flex items-center space-x-4">
                 <CardList closeForm={closeForm}/>
 
