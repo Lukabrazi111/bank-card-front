@@ -16,14 +16,20 @@ function Card() {
         setVisibleForm(false);
     };
 
-    return (<section className="shadow-2xl rounded-lg px-10 py-12 w-full max-w-xl space-y-8">
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        console.log('submitted');
+    };
+
+    return (
+        <section className="shadow-2xl rounded-lg px-10 py-12 w-full max-w-xl space-y-8">
         <header>
             <h1 className="text-2xl">Пополнить банковской картой</h1>
         </header>
 
         <CardCurrencyConverter/>
 
-        <form action="#" className="space-y-7">
+        <form onSubmit={handleSubmit} className="space-y-7">
             <div className="flex items-center space-x-4">
                 <CardList closeForm={closeForm}/>
 
@@ -38,7 +44,8 @@ function Card() {
 
             <CardForm visible={visibleForm}/>
         </form>
-    </section>);
+    </section>
+    );
 }
 
 export default Card;
