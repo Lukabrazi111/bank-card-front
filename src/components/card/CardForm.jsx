@@ -1,22 +1,37 @@
 import CustomCheckbox from "../ui/CustomCheckbox.jsx";
 import ExclamationMarkIcon from "../../icons/ExclamationMarkIcon.jsx";
 import {useState} from "react";
+import axios from "../../config/axios.js";
 
 function CardForm(props) {
     const [monthError, setMonthError] = useState(false);
     const [yearError, setYearError] = useState(false);
+    const [message, setMessage] = useState('');
+    const [saveCard, setSaveCard] = useState(false);
+    const [formData, setFormData] = useState({
+        number: '',
+        expiration_month: '',
+        expiration_year: '',
+        security_code: '',
+        is_saved: false,
+    });
 
     const handleChange = (event, maxLength) => {
         const {name, value} = event.target;
         const length = event.target.value.length;
         const trimmedValue = value.slice(0, maxLength);
 
+        setFormData((prev) => ({
+            ...prev,
+            [name]: trimmedValue,
+        }));
+
         if (length >= maxLength) {
             event.target.value = value.slice(0, maxLength);
         }
 
         // Simple validation example
-        if (name === 'month') {
+        if (name === 'expiration_month') {
             if (trimmedValue > 12) {
                 setMonthError(true);
             } else {
@@ -24,7 +39,7 @@ function CardForm(props) {
             }
         }
 
-        if (name === 'year') {
+        if (name === 'expiration_year') {
             const year = new Date().getFullYear().toString().slice(-2);
 
             if (trimmedValue < year) {
@@ -33,7 +48,6 @@ function CardForm(props) {
                 setYearError(false);
             }
         }
-
     };
 
     const addLeadingZero = (event) => {
@@ -55,8 +69,35 @@ function CardForm(props) {
         }
     };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        try {
+            // just example
+            const mappedData = {
+                ...formData,
+                expiration_year: Number(formData.expiration_year) + 2000,
+                is_saved: saveCard,
+            };
+
+            const response = await axios.post('/cards', mappedData);
+            if (response.status === 200) {
+                setFormData({
+                    number: '',
+                    expiration_month: '',
+                    expiration_year: '',
+                    security_code: '',
+                    is_saved: false,
+                })
+                alert('card added');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
-        <div className="space-y-7">
+        <form onSubmit={handleSubmit} className="space-y-7">
             <div className={`space-y-7 ${props.visible ? 'block' : 'hidden'}`}>
                 <div className="flex items-center justify-center">
                     <div className="card px-5 py-6 pt-14 flex flex-col items-start rounded-lg h-64 space-y-4">
@@ -64,9 +105,10 @@ function CardForm(props) {
                             <label htmlFor="card_number" className="text-white uppercase ">Номер карты</label>
                             {/*TODO: need to validate card number, and if card is not valid - set red border on input*/}
                             <input
+                                value={formData.number}
                                 onKeyPress={preventMinusPlus}
                                 onChange={(event) => handleChange(event, 16)}
-                                name="card_number"
+                                name="number"
                                 type="number"
                                 placeholder="Номер карты"
                                 className="bg-white px-2 py-1.5 mt-2 w-full rounded-lg placeholder:text-gray-400"
@@ -77,11 +119,12 @@ function CardForm(props) {
                             <div className="space-x-3 mt-2">
                                 {/*TODO: need to check if month greater than 12*/}
                                 <input
+                                    value={formData.expiration_month}
                                     onKeyPress={preventMinusPlus}
                                     onChange={(event) => handleChange(event, 2)}
                                     onBlur={(event) => addLeadingZero(event)}
                                     min={0}
-                                    name="month"
+                                    name="expiration_month"
                                     type="number"
                                     placeholder="ММ"
                                     className={`bg-white placeholder:text-gray-400 px-2 py-1.5 w-full max-w-16 rounded-lg ${monthError ? 'border-2 border-red-500' : ''}`}
@@ -89,9 +132,10 @@ function CardForm(props) {
                                 <span className="text-white">/</span>
                                 {/*TODO: need to check if year is greater or equal than 'today', else - set red input*/}
                                 <input
+                                    value={formData.expiration_year}
                                     onKeyPress={preventMinusPlus}
                                     onChange={(event) => handleChange(event, 2)}
-                                    name="year"
+                                    name="expiration_year"
                                     type="number"
                                     placeholder="ГГ"
                                     className={`bg-white  placeholder:text-gray-400 px-2 py-1.5 w-full max-w-16 rounded-lg ${yearError ? 'border-2 border-red-500' : ''}`}
@@ -106,9 +150,10 @@ function CardForm(props) {
                         <div className="px-5 flex flex-col items-start space-y-3">
                             <span className="text-gray-600 mt-2">CVV/CVC</span>
                             <input
+                                value={formData.security_code}
                                 onChange={(event) => handleChange(event, 3)}
                                 type="number"
-                                name="cvv"
+                                name="security_code"
                                 placeholder="000"
                                 className="bg-white placeholder:text-gray-400 px-4 py-1.5 w-full max-w-20 rounded-lg placeholder:text-lg"
                             />
@@ -119,7 +164,7 @@ function CardForm(props) {
 
                 <div className="flex items-center space-x-4 mt-4">
                     <div>
-                        <CustomCheckbox/>
+                        <CustomCheckbox saveCard={() => setSaveCard(!saveCard)}/>
                     </div>
                     <div className="text-sm">
                         <div className="flex items-center space-x-2">
@@ -136,7 +181,7 @@ function CardForm(props) {
                     className="bg-blue-500 hover:bg-blue-600 transition-colors text-white px-10 py-3 rounded-full font-bold">
                 Оплатит
             </button>
-        </div>
+        </form>
     );
 }
 
